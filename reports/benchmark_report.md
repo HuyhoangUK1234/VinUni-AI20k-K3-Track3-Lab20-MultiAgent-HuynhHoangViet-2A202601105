@@ -24,6 +24,17 @@ This report compares runs using latency, estimated cost, quality, citation cover
 - Multi-agent workflow is slower because it retrieves sources, analyzes notes, and writes with citations.
 - Token usage is estimated by the local LLM fallback unless USE_LIVE_LLM=true.
 
+## Failure Mode and Fix
+
+Failure mode observed during implementation: the system initially tried to use live external
+providers whenever API keys were present in `.env`. In an offline or restricted lab environment,
+this could cause connection failures and make the demo non-reproducible.
+
+Fix: `LLMClient` now uses a deterministic local fallback by default and only calls a live LLM
+when `USE_LIVE_LLM=true`. `SearchClient` also uses the offline corpus in
+`ai_agent_offline_research_corpus_v2`, so benchmark results are stable and repeatable. LangSmith
+tracing is enabled for CLI runs, but disabled during pytest to keep tests deterministic.
+
 ## Route History
 
 - Baseline: ['single-step']

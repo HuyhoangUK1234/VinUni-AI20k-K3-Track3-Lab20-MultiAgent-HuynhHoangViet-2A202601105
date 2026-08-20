@@ -115,3 +115,14 @@ Má»—i nhĂ³m tráº£ lá»i 2 cĂ¢u:
 
 1. Case nĂ o nĂªn dĂ¹ng multi-agent? VĂ¬ sao?
 2. Case nĂ o khĂ´ng nĂªn dĂ¹ng multi-agent? VĂ¬ sao?
+
+### Câu trả lời
+
+1. Nên dùng multi-agent khi tác vụ nghiên cứu có nhiều bước độc lập hoặc bán độc lập:
+   cần tìm nguồn, phân tích bằng chứng, kiểm tra citation và tổng hợp báo cáo. Trong
+   các trường hợp này, việc tách vai trò giúp tăng traceability, giảm lẫn trách nhiệm
+   giữa các bước và làm benchmark/debug dễ hơn.
+
+2. Không nên dùng multi-agent khi tác vụ ngắn, đơn giản, không cần evidence trail hoặc
+   có thể trả lời tốt bằng một agent duy nhất. Khi đó, multi-agent chỉ làm tăng latency,
+   token usage và độ phức tạp điều phối mà không tạo thêm giá trị rõ ràng.
