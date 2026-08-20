@@ -1,98 +1,98 @@
-# Lab Guide: Multi-Agent Research System
+﻿# Lab Guide: Multi-Agent Research System
 
 ## Scenario
 
-Bạn cần xây dựng một research assistant có thể nhận câu hỏi dài, tìm thông tin, phân tích và viết câu trả lời cuối cùng. Lab yêu cầu so sánh hai cách làm:
+Báº¡n cáº§n xĂ¢y dá»±ng má»™t research assistant cĂ³ thá»ƒ nháº­n cĂ¢u há»i dĂ i, tĂ¬m thĂ´ng tin, phĂ¢n tĂ­ch vĂ  viáº¿t cĂ¢u tráº£ lá»i cuá»‘i cĂ¹ng. Lab yĂªu cáº§u so sĂ¡nh hai cĂ¡ch lĂ m:
 
-1. **Single-agent baseline**: một agent làm toàn bộ.
-2. **Multi-agent workflow**: Supervisor điều phối Researcher, Analyst, Writer.
+1. **Single-agent baseline**: má»™t agent lĂ m toĂ n bá»™.
+2. **Multi-agent workflow**: Supervisor Ä‘iá»u phá»‘i Researcher, Analyst, Writer.
 
-## Quy tắc quan trọng
+## Quy táº¯c quan trá»ng
 
-- Không thêm agent nếu không có lý do rõ ràng.
-- Mỗi agent phải có responsibility riêng.
-- Shared state phải đủ rõ để debug.
-- Phải có trace hoặc log cho từng bước.
-- Phải benchmark, không chỉ nhìn output bằng cảm tính.
+- KhĂ´ng thĂªm agent náº¿u khĂ´ng cĂ³ lĂ½ do rĂµ rĂ ng.
+- Má»—i agent pháº£i cĂ³ responsibility riĂªng.
+- Shared state pháº£i Ä‘á»§ rĂµ Ä‘á»ƒ debug.
+- Pháº£i cĂ³ trace hoáº·c log cho tá»«ng bÆ°á»›c.
+- Pháº£i benchmark, khĂ´ng chá»‰ nhĂ¬n output báº±ng cáº£m tĂ­nh.
 
 ## Milestone 1: Baseline
 
-File gợi ý:
+File gá»£i Ă½:
 
 - `src/multi_agent_research_lab/cli.py`
 - `src/multi_agent_research_lab/services/llm_client.py`
 
-TODO(student): thay baseline placeholder bằng một call LLM thật.
+IMPLEMENTED: thay baseline placeholder báº±ng má»™t call LLM tháº­t.
 
 ## Milestone 2: Supervisor
 
-File gợi ý:
+File gá»£i Ă½:
 
 - `src/multi_agent_research_lab/agents/supervisor.py`
 - `src/multi_agent_research_lab/graph/workflow.py`
 
-TODO(student): implement routing policy.
+IMPLEMENTED: implement routing policy.
 
-Gợi ý câu hỏi thiết kế:
+Gá»£i Ă½ cĂ¢u há»i thiáº¿t káº¿:
 
-- Khi nào gọi Researcher?
-- Khi nào gọi Analyst?
-- Khi nào gọi Writer?
-- Khi nào stop?
-- Nếu agent fail thì retry hay fallback?
+- Khi nĂ o gá»i Researcher?
+- Khi nĂ o gá»i Analyst?
+- Khi nĂ o gá»i Writer?
+- Khi nĂ o stop?
+- Náº¿u agent fail thĂ¬ retry hay fallback?
 
 ## Milestone 3: Worker agents
 
-File gợi ý:
+File gá»£i Ă½:
 
 - `src/multi_agent_research_lab/agents/researcher.py`
 - `src/multi_agent_research_lab/agents/analyst.py`
 - `src/multi_agent_research_lab/agents/writer.py`
 
-TODO(student): implement từng worker.
+IMPLEMENTED: implement tá»«ng worker.
 
-## Milestone 4: Trace và benchmark
+## Milestone 4: Trace vĂ  benchmark
 
-File gợi ý:
+File gá»£i Ă½:
 
 - `src/multi_agent_research_lab/observability/tracing.py`
 - `src/multi_agent_research_lab/evaluation/benchmark.py`
 - `src/multi_agent_research_lab/evaluation/report.py`
 
-Benchmark tối thiểu:
+Benchmark tá»‘i thiá»ƒu:
 
-| Metric | Cách đo gợi ý |
+| Metric | CĂ¡ch Ä‘o gá»£i Ă½ |
 |---|---|
 | Latency | wall-clock time |
-| Cost | token usage hoặc provider usage |
+| Cost | token usage hoáº·c provider usage |
 | Quality | rubric 0-10 do peer review |
-| Citation coverage | số claims có source / tổng claims chính |
-| Failure rate | số query fail / tổng query |
+| Citation coverage | sá»‘ claims cĂ³ source / tá»•ng claims chĂ­nh |
+| Failure rate | sá»‘ query fail / tá»•ng query |
 
 ## Troubleshooting
 
-### macOS: lỗi SSL certificate khi gọi API qua HTTPS (Tavily, OpenAI, ...)
+### macOS: lá»—i SSL certificate khi gá»i API qua HTTPS (Tavily, OpenAI, ...)
 
-Triệu chứng: khi implement `SearchClient` (hoặc bất kỳ HTTPS call nào) trên macOS, bạn có thể gặp lỗi kiểu:
+Triá»‡u chá»©ng: khi implement `SearchClient` (hoáº·c báº¥t ká»³ HTTPS call nĂ o) trĂªn macOS, báº¡n cĂ³ thá»ƒ gáº·p lá»—i kiá»ƒu:
 
 ```
 ssl.SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed:
 unable to get local issuer certificate
 ```
 
-Nguyên nhân: Python cài từ python.org trên macOS **không dùng** certificate store của hệ điều hành, nên không tìm thấy CA bundle hợp lệ. Đây là lỗi môi trường, **không phải** do API key sai.
+NguyĂªn nhĂ¢n: Python cĂ i tá»« python.org trĂªn macOS **khĂ´ng dĂ¹ng** certificate store cá»§a há»‡ Ä‘iá»u hĂ nh, nĂªn khĂ´ng tĂ¬m tháº¥y CA bundle há»£p lá»‡. ÄĂ¢y lĂ  lá»—i mĂ´i trÆ°á»ng, **khĂ´ng pháº£i** do API key sai.
 
-Cách khắc phục (chọn 1 trong 3):
+CĂ¡ch kháº¯c phá»¥c (chá»n 1 trong 3):
 
-1. **Chạy script cài certificate đi kèm Python** (nhanh nhất):
+1. **Cháº¡y script cĂ i certificate Ä‘i kĂ¨m Python** (nhanh nháº¥t):
 
    ```bash
    /Applications/Python\ 3.12/Install\ Certificates.command
    ```
 
-   (thay `3.12` bằng version Python của bạn)
+   (thay `3.12` báº±ng version Python cá»§a báº¡n)
 
-2. **Dùng `certifi` trong code** — thêm `certifi` vào dependencies, rồi tạo SSL context khi gọi HTTPS:
+2. **DĂ¹ng `certifi` trong code** â€” thĂªm `certifi` vĂ o dependencies, rá»“i táº¡o SSL context khi gá»i HTTPS:
 
    ```python
    import certifi
@@ -103,7 +103,7 @@ Cách khắc phục (chọn 1 trong 3):
    urlopen(request, timeout=timeout, context=ssl_context)
    ```
 
-3. **Set biến môi trường** trỏ tới CA bundle của certifi (không cần đổi code):
+3. **Set biáº¿n mĂ´i trÆ°á»ng** trá» tá»›i CA bundle cá»§a certifi (khĂ´ng cáº§n Ä‘á»•i code):
 
    ```bash
    export SSL_CERT_FILE=$(python -m certifi)
@@ -111,7 +111,7 @@ Cách khắc phục (chọn 1 trong 3):
 
 ## Exit ticket
 
-Mỗi nhóm trả lời 2 câu:
+Má»—i nhĂ³m tráº£ lá»i 2 cĂ¢u:
 
-1. Case nào nên dùng multi-agent? Vì sao?
-2. Case nào không nên dùng multi-agent? Vì sao?
+1. Case nĂ o nĂªn dĂ¹ng multi-agent? VĂ¬ sao?
+2. Case nĂ o khĂ´ng nĂªn dĂ¹ng multi-agent? VĂ¬ sao?

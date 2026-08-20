@@ -1,7 +1,18 @@
 """LangGraph workflow skeleton."""
 
-from multi_agent_research_lab.core.errors import StudentTodoError
+from time import perf_counter
+
+from multi_agent_research_lab.agents import (
+    AnalystAgent,
+    ResearcherAgent,
+    SupervisorAgent,
+    WriterAgent,
+)
+from multi_agent_research_lab.agents.base import BaseAgent
+from multi_agent_research_lab.core.config import get_settings
+from multi_agent_research_lab.core.errors import AgentExecutionError
 from multi_agent_research_lab.core.state import ResearchState
+from multi_agent_research_lab.observability.tracing import trace_span
 
 
 class MultiAgentWorkflow:
@@ -10,19 +21,52 @@ class MultiAgentWorkflow:
     Keep orchestration here; keep agent internals in `agents/`.
     """
 
-    def build(self) -> object:
-        """Create a LangGraph graph.
+    def build(self) -> dict[str, BaseAgent]:
+        """Create the executable graph node registry.
 
-        TODO(student): Implement nodes, edges, conditional routing, and stop condition.
         Suggested nodes: supervisor, researcher, analyst, writer, optional critic.
         """
 
-        raise StudentTodoError("TODO(student): implement MultiAgentWorkflow.build")
+        return {
+            "supervisor": SupervisorAgent(),
+            "researcher": ResearcherAgent(),
+            "analyst": AnalystAgent(),
+            "writer": WriterAgent(),
+        }
 
     def run(self, state: ResearchState) -> ResearchState:
         """Execute the graph and return final state.
-
-        TODO(student): Compile graph, invoke it, and convert result back to ResearchState.
         """
 
-        raise StudentTodoError("TODO(student): implement MultiAgentWorkflow.run")
+        settings = get_settings()
+        graph = self.build()
+        started = perf_counter()
+
+        with trace_span("multi_agent_workflow", {"query": state.request.query}) as span:
+            while True:
+                if perf_counter() - started > settings.timeout_seconds:
+                    state.errors.append("Workflow stopped because timeout_seconds was reached.")
+                    break
+
+                supervisor = graph["supervisor"]
+                state = supervisor.run(state)
+                route = state.route_history[-1]
+                if route == "done":
+                    break
+
+                worker = graph.get(route)
+                if worker is None:
+                    raise AgentExecutionError(f"Supervisor selected unknown route: {route}")
+                state = worker.run(state)
+
+            span["final_route_history"] = state.route_history
+            span["error_count"] = len(state.errors)
+            state.add_trace_event(
+                "workflow",
+                {
+                    "route_history": state.route_history,
+                    "error_count": len(state.errors),
+                    "duration_seconds": perf_counter() - started,
+                },
+            )
+        return state

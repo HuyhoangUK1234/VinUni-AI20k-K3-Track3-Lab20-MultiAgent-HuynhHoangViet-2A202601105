@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo Multi-Agent Research System</title>
+  <style>
+    :root {
+      --ink: #172026;
+      --muted: #5d6872;
+      --line: #d7dee6;
+      --paper: #f7f8fa;
+      --panel: #ffffff;
+      --teal: #0f766e;
+      --blue: #2563eb;
+      --rose: #be123c;
+      --amber: #b45309;
+      --green: #15803d;
+      --shadow: 0 12px 28px rgba(20, 28, 38, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: #10212b;
+      color: #fff;
+      border-bottom: 5px solid var(--teal);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .top {
+      min-height: 58vh;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: center;
+      padding: 36px 0;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 46px;
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 0 0 22px;
+      color: #d8e4ea;
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 8px;
+      color: #eaf3f7;
+      background: rgba(255, 255, 255, 0.08);
+      font-size: 14px;
+    }
+
+    .system-map {
+      background: #f2f7f7;
+      color: var(--ink);
+      border: 1px solid #b7d0ce;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .map-title {
+      margin: 0 0 14px;
+      font-weight: 700;
+      color: #0b3f3a;
+    }
+
+    .flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .node {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 62px;
+      padding: 10px;
+      border: 1px solid #c8d8df;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .supervisor { background: var(--teal); }
+    .researcher { background: var(--blue); }
+    .analyst { background: var(--amber); }
+    .writer { background: var(--rose); }
+
+    .node strong {
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    main {
+      padding: 28px 0 46px;
+    }
+
+    section {
+      margin: 0 0 28px;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 3px 12px rgba(20, 28, 38, 0.04);
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 112px;
+      border-left: 5px solid var(--teal);
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .metric .value {
+      margin-top: 8px;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .compare {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(20, 28, 38, 0.04);
+    }
+
+    .compare th,
+    .compare td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .compare th {
+      background: #eaf1f4;
+      color: #10212b;
+      font-size: 14px;
+    }
+
+    .compare tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 190px 1fr 74px;
+      gap: 10px;
+      align-items: center;
+      margin: 12px 0;
+    }
+
+    .bar-track {
+      height: 18px;
+      border-radius: 8px;
+      background: #e5ebef;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: 8px;
+      background: var(--teal);
+    }
+
+    .bar.fast {
+      background: var(--blue);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      overflow-x: auto;
+      background: #0d1620;
+      color: #dbeafe;
+      border-radius: 8px;
+      border: 1px solid #223241;
+      font-size: 14px;
+    }
+
+    .script {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    ol {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    .note {
+      border-left: 5px solid var(--amber);
+      background: #fff8eb;
+    }
+
+    footer {
+      padding: 22px 0;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 860px) {
+      .top,
+      .grid,
+      .metric-grid,
+      .script {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 34px;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap top">
+      <div>
+        <h1>Multi-Agent Research System</h1>
+        <p class="lead">
+          Demo hệ thống nghiên cứu đa tác tử chạy offline: Supervisor điều phối,
+          Researcher tìm nguồn trong corpus, Analyst phân tích, Writer tạo câu trả lời có trích dẫn.
+        </p>
+        <div class="hero-actions">
+          <span class="pill">Offline corpus</span>
+          <span class="pill">Trace từng agent</span>
+          <span class="pill">Single vs Multi benchmark</span>
+        </div>
+      </div>
+
+      <div class="system-map">
+        <p class="map-title">Luồng xử lý chính</p>
+        <div class="flow">
+          <div class="node">
+            <div class="icon supervisor">S</div>
+            <div><strong>Supervisor</strong><span>Chọn route tiếp theo và kiểm soát vòng lặp.</span></div>
+          </div>
+          <div class="node">
+            <div class="icon researcher">R</div>
+            <div><strong>Researcher</strong><span>Tìm nguồn từ ai_agent_offline_research_corpus_v2.</span></div>
+          </div>
+          <div class="node">
+            <div class="icon analyst">A</div>
+            <div><strong>Analyst</strong><span>Tạo analysis notes từ research notes.</span></div>
+          </div>
+          <div class="node">
+            <div class="icon writer">W</div>
+            <div><strong>Writer</strong><span>Viết final answer và danh sách Sources.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>1. Kịch bản demo</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Câu hỏi đầu vào</h3>
+          <p>Compare single-agent and multi-agent architectures for complex research tasks.</p>
+        </div>
+        <div class="card">
+          <h3>Dữ liệu sử dụng</h3>
+          <p>Corpus offline gồm 30 topic JSON về AI agents, source documents, facts và rubric.</p>
+        </div>
+        <div class="card">
+          <h3>Kết quả mong đợi</h3>
+          <p>Final answer có nguồn, trace rõ route và bảng benchmark single vs multi-agent.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>2. Lệnh chạy demo</h2>
+      <pre>.\.venv\Scripts\python.exe -m multi_agent_research_lab.cli multi-agent --query "Compare single-agent and multi-agent architectures for complex research tasks"</pre>
+    </section>
+
+    <section>
+      <h2>3. Kết quả benchmark</h2>
+      <table class="compare">
+        <thead>
+          <tr>
+            <th>Run</th>
+            <th>Latency</th>
+            <th>Token usage</th>
+            <th>Sources</th>
+            <th>Citation coverage</th>
+            <th>Quality</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Single-agent baseline</strong></td>
+            <td>0.00s</td>
+            <td>45 input + 84 output = 129 total</td>
+            <td>0</td>
+            <td>0%</td>
+            <td>4.0 / 10</td>
+          </tr>
+          <tr>
+            <td><strong>Multi-agent offline corpus</strong></td>
+            <td>3.08s</td>
+            <td>1,807 input + 179 output = 1,986 total</td>
+            <td>5</td>
+            <td>100%</td>
+            <td>10.0 / 10</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>4. Latency và token usage</h2>
+      <div class="metric-grid">
+        <div class="card metric">
+          <div class="label">Single latency</div>
+          <div class="value">0.00s</div>
+        </div>
+        <div class="card metric">
+          <div class="label">Multi latency</div>
+          <div class="value">3.08s</div>
+        </div>
+        <div class="card metric">
+          <div class="label">Multi input tokens</div>
+          <div class="value">1,807</div>
+        </div>
+        <div class="card metric">
+          <div class="label">Multi total tokens</div>
+          <div class="value">1,986</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 14px;">
+        <div class="bar-row">
+          <strong>Single-agent latency</strong>
+          <div class="bar-track"><div class="bar fast" style="width: 3%;"></div></div>
+          <span>0.00s</span>
+        </div>
+        <div class="bar-row">
+          <strong>Multi-agent latency</strong>
+          <div class="bar-track"><div class="bar" style="width: 100%;"></div></div>
+          <span>3.08s</span>
+        </div>
+        <div class="bar-row">
+          <strong>Researcher tokens</strong>
+          <div class="bar-track"><div class="bar" style="width: 42%;"></div></div>
+          <span>838</span>
+        </div>
+        <div class="bar-row">
+          <strong>Analyst tokens</strong>
+          <div class="bar-track"><div class="bar" style="width: 8%;"></div></div>
+          <span>160</span>
+        </div>
+        <div class="bar-row">
+          <strong>Writer tokens</strong>
+          <div class="bar-track"><div class="bar" style="width: 50%;"></div></div>
+          <span>988</span>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>5. Điểm cần nói khi trình bày</h2>
+      <div class="script">
+        <div class="card">
+          <h3>Luồng demo</h3>
+          <ol>
+            <li>Nhập query nghiên cứu.</li>
+            <li>Supervisor route sang Researcher.</li>
+            <li>Researcher lấy nguồn từ corpus offline.</li>
+            <li>Analyst phân tích research notes.</li>
+            <li>Writer tạo final answer có Sources.</li>
+            <li>Supervisor kết thúc ở trạng thái done.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Thông điệp chính</h3>
+          <ol>
+            <li>Single-agent nhanh hơn nhưng thiếu evidence trail.</li>
+            <li>Multi-agent tốn latency và token hơn.</li>
+            <li>Đổi lại có source retrieval, citation, trace và phân vai rõ.</li>
+            <li>Corpus offline giúp benchmark tái lập, không phụ thuộc internet.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. Failure modes đã xử lý</h2>
+      <div class="grid">
+        <div class="card note">
+          <h3>Không có API key</h3>
+          <p>LLMClient mặc định dùng fallback offline. Chỉ gọi OpenAI khi bật USE_LIVE_LLM=true.</p>
+        </div>
+        <div class="card note">
+          <h3>Workflow lặp vô hạn</h3>
+          <p>Supervisor kiểm soát bằng max_iterations và dừng khi đủ final_answer.</p>
+        </div>
+        <div class="card note">
+          <h3>Search không ổn định</h3>
+          <p>Dùng corpus offline thay vì web search để kết quả demo có thể tái lập.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>7. Kết luận demo</h2>
+      <div class="card">
+        <p>
+          Hệ thống đã chạy end-to-end với shared state, route history, trace,
+          retrieval từ corpus offline và benchmark single-agent vs multi-agent.
+          Single-agent có latency thấp hơn; multi-agent có chất lượng evidence,
+          citation coverage và khả năng debug tốt hơn.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      File demo standalone. Có thể mở trực tiếp bằng trình duyệt.
+    </div>
+  </footer>
+</body>
+</html>
